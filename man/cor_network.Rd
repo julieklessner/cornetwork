@@ -4,28 +4,52 @@
 \alias{cor_network}
 \title{Correlation Network}
 \usage{
-cor_network(data, tax.aggregate = "Phylum", tax.add = NULL,
-  tax.class = NULL, tax.empty = "best", threshold.cor = 0.8,
-  threshold.count = 10)
+cor_network(data, threshold.cor = 0.8, threshold.count = 10,
+  show.label = TRUE, scale.abund = FALSE, node.size = 5,
+  scale.cor = FALSE, edge.size = 0.5, highlight.OTU = NULL,
+  highlight.color = NULL, highlight.size = 10, highlight.label = NULL,
+  tax.aggregate = "Phylum", tax.add = NULL, tax.class = NULL,
+  tax.empty = "best", add.tax.info = FALSE, show.edge.label = FALSE)
 }
 \arguments{
 \item{data}{(required) A phyloseq object.}
 
-\item{tax.aggregate}{The taxonomic level that the data should be aggregated to (default: "Phylum")}
+\item{threshold.cor}{Threshold value for the correlation (default: 0.8).}
 
-\item{tax.add}{Additional taxonomic levels to display for each entry, e.g. "Phylum" (default: "none").}
+\item{threshold.count}{Threshold value for abundance reads (default: 10).}
+
+\item{show.label}{Show vertex names as labels (default: TRUE).}
+
+\item{scale.abund}{Scale the node size according to average abundance (default: FALSE).}
+
+\item{node.size}{Size of nodes if scale.abund=FALSE (default: 5)}
+
+\item{scale.cor}{Scale the edge color according to strength of correlation (default: FALSE).}
+
+\item{edge.size}{Size of egdes if scale.cor=FALSE (default: 0.5)}
+
+\item{highlight.OTU}{Highlight OTUs using see-throgh nodes, e.g. c("MiDAS_37", "MiDAS_73") (default: none).}
+
+\item{highlight.color}{Color of highlights, e.g. c("purple", "green") (default: none).}
+
+\item{highlight.size}{Size of highlights (default: 10).}
+
+\item{highlight.label}{Highlight OTUs using node labels, e.g. c("MiDAS_37", "MiDAS_73") (default:none).}
+
+\item{tax.aggregate}{The taxonomic level that the data should be aggregated to (default: "Phylum")}
 
 \item{tax.class}{Converts a specific phyla to class level instead, e.g. "p__Proteobacteria" (default: "none").}
 
 \item{tax.empty}{Either "remove" OTUs without taxonomic information, add "best" classification or add the "OTU" name (default: "best").}
 
-\item{threshold.cor}{Threshold value for the correlation (default: 0.8).}
+\item{add.tax.info}{Show taxonomic information (default: FALSE).}
 
-\item{threshold.count}{Threshold value for abundance reads (default: 10).}
+\item{show.edge.label}{Show correlation values as edge labels (default: FALSE).}
 }
 \description{
 This function allows you to build a network based on correlations
 }
 \keyword{correlation}
+\keyword{ggnetwork}
 \keyword{network}
 
