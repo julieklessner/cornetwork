@@ -26,9 +26,6 @@
 
 cor_network <- function(data, threshold.cor= 0.8, threshold.count=10, show.label=TRUE, scale.abund=FALSE, node.size=5, scale.cor=FALSE, edge.size = 0.5, highlight.OTU=NULL, highlight.color=NULL, highlight.size=10, highlight.label=NULL, tax.aggregate="Phylum", tax.add=NULL, tax.class=NULL, tax.empty="best", add.tax.info=FALSE, show.edge.label=FALSE){
   
-  # Extracting data from phyloseq------------------------------------------------------
-  
-
   data0 <- list(abund = as.data.frame(otu_table(data)@.Data),
                 tax = data.frame(tax_table(data)@.Data, OTU =   rownames(tax_table(data))),
                 sample = suppressWarnings(as.data.frame(as.matrix(sample_data(data)))))
@@ -75,13 +72,14 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.count=10, show.label
   
   net <- network(cor4[ ,1:2 ], directed=FALSE)
   
-  #Assigning Rval as edge attribute -----------------------------------------------
+  #Assigning Rval to edges
   
   set.edge.attribute(net, "Rval", cor4$Rval)
   
   #Assigning abundance values to nodes---------------------------------------------
   
   names = ggnetwork(net)$vertex.names %>% unique() %>% as.character()
+  names2 = ggnetwork(net)$vertex.names %>% as.data.frame()
   
   abund_cor <- abund[names, ] 
   abund_mean <- rowMeans(abund_cor) 
@@ -89,7 +87,7 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.count=10, show.label
   
   net %v% "Avg_Abundance" <- abund_mean
   
-  #Assigning taxonomic information to nodes-----------------------------------------
+  #Assigning taxonomic information to nodes
   
   tax <- data.frame(tax, Display = tax[,tax.aggregate])
   rownames(tax) <- tax$OTU
@@ -101,61 +99,52 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.count=10, show.label
   
   #Visualizing using ggnetwork-------------------------------------------------------
   
+  
   p <- ggplot(net, arrow.gap = 0, aes(x=x, y=y, xend=xend, yend=yend)) +
     geom_nodes()+
     theme_blank()
   
   #Options for edges---------------------------------------------------------------- 
   if (scale.cor == T){
-    p <- p + geom_edges(alpha = 0.6, size=2, aes(color = Rval))
+    p <- p + geom_edges(alpha = 0.6, size=2, aes(color = Rval)) #+ scale_color_gradient2()
   } else {
     p <- p + geom_edges(alpha = 0.6, size=edge.size)
   }
   
   #Options for nodes----------------------------------------------------------------
-  
-  #Scaling nodesize to abundance
   if (scale.abund == T){
-    p <- p + geom_nodes(aes(size= Avg_Abundance, col=taxo_info))
+    p <- p + geom_nodes(aes(size= Avg_Abundance))
   } else {
     p <- p + geom_nodes(size = node.size)
   }
   
-  #Adding taxonomic information to nodes
   if(add.tax.info == T & scale.cor == T){
     print("Mapping a color to both a vertex attribute and an edge attribute will violate the grammer of graphics")
-  } else if (add.tax.info == T) {
-    p <- p + geom_nodes(aes(col=taxo_info))
+  } else if (add.tax.info == T & scale.abund == T) {
+    p <- p + geom_nodes(aes(size= Avg_Abundance, col=taxo_info))
+  } else if (add.tax.info == T & scale.abund == F) {
+    p <- p + geom_nodes(aes(size= node.size, col=taxo_info))
   }
   
   #Options for labels----------------------------------------------------------------
-  
-  #Show correlation value as labels on edges
   if(show.edge.label == T){
     p <- p + geom_edgelabel(aes(label = signif(Rval, digits = 2)))
   }
   
-  #Show vertex names as label on nodes 
   if (show.label == T){
     p <- p + geom_nodetext(aes(label=vertex.names), nudge_x = 0.05) 
   }
   
   #Options for highlights------------------------------------------------------------
   
-  #Highlight using see-through nodes
   if(!is.null(highlight.OTU)){
     p <- p + geom_nodes(data = function(x) { x[ x$vertex.names == highlight.OTU, ]}, col=highlight.color, size= 10, alpha = 0.2)
   }
   
-  #Highlight using node label
   if(!is.null(highlight.label)){
     p <- p + geom_nodelabel_repel(aes(label = vertex.names),
                                   box.padding = unit(1, "lines"),
                                   data = function(x) { x[ x$vertex.names == highlight.label, ]})
   }  
-  
-  
-  #Output----------------------------------------------------------------------------
-  p
-  
-}
+p
+  }
