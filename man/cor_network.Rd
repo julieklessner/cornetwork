@@ -4,19 +4,23 @@
 \alias{cor_network}
 \title{Correlation Network}
 \usage{
-cor_network(data, threshold.cor = 0.8, threshold.count = 10,
-  show.label = TRUE, scale.abund = FALSE, node.size = 5,
-  scale.cor = FALSE, edge.size = 0.5, highlight.OTU = NULL,
-  highlight.color = NULL, highlight.size = 10, highlight.label = NULL,
-  tax.aggregate = "Phylum", tax.add = NULL, tax.class = NULL,
-  tax.empty = "best", add.tax.info = FALSE, show.edge.label = FALSE)
+cor_network(data, threshold.cor = 0.8, threshold.abund = 0.01,
+  threshold.obs = 0.1, show.label = TRUE, scale.abund = FALSE,
+  node.size = 5, scale.cor = FALSE, edge.size = 0.5,
+  highlight.OTU = NULL, highlight.color = NULL, highlight.size = 10,
+  highlight.label = NULL, tax.aggregate = "Phylum", tax.add = NULL,
+  tax.class = NULL, tax.empty = "best", add.tax.info = FALSE,
+  show.edge.label = FALSE, correlation = "Pearson", return.output = "top",
+  output.top = 25)
 }
 \arguments{
 \item{data}{(required) A phyloseq object.}
 
 \item{threshold.cor}{Threshold value for the correlation (default: 0.8).}
 
-\item{threshold.count}{Threshold value for abundance reads (default: 10).}
+\item{threshold.abund}{Threshold value for relative abundance (default: 0.01).}
+
+\item{threshold.obs}{Threshold value for the average relative abundance per observation (default. 0.1)}
 
 \item{show.label}{Show vertex names as labels (default: TRUE).}
 
@@ -45,6 +49,12 @@ cor_network(data, threshold.cor = 0.8, threshold.count = 10,
 \item{add.tax.info}{Show taxonomic information (default: FALSE).}
 
 \item{show.edge.label}{Show correlation values as edge labels (default: FALSE).}
+
+\item{correlation}{Choose the method for calculation of correlation from Pearson, Spearman, SparCC, CClasso or Rebacca (default: "Pearson").}
+
+\item{return.output}{Either "top" or "total" or "plot" (default: "top").}
+
+\item{output.top}{Number of correlations returned if return.output is set to top (default: 25).}
 }
 \description{
 This function allows you to build a network based on correlations
@@ -52,4 +62,3 @@ This function allows you to build a network based on correlations
 \keyword{correlation}
 \keyword{ggnetwork}
 \keyword{network}
-
