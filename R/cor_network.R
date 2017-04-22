@@ -28,9 +28,9 @@
 #' @import ggnetwork
 #' @import sna
 #' @import viridis
-#' @import MCMCpack
 #' @import glmnet
 #' @import parallel
+#' @import psych
 #' @export
 
 cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshold.obs=0.1, threshold.pval=0.05, show.label=TRUE, scale.abund=FALSE, node.size=5, scale.cor=FALSE, edge.size = 0.5, highlight.OTU=NULL, highlight.color=NULL, highlight.size=10, highlight.label=NULL, tax.aggregate="Phylum", tax.add=NULL, tax.class=NULL, tax.empty="best", add.tax.info=FALSE, show.edge.label=FALSE, correlation = "Pearson", return.output = "top", show.top = 25){
@@ -87,20 +87,25 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
   if(correlation == "SparCC"){
     res_cc <- sparcc(t(abunds))
     cormat1 <- res_cc$Cor
-    pmat <- cormat1
-    dfr = nrow(t(abunds))-2
-    above <- row(pmat) < col(pmat)
-    r2 <- pmat[above]^2
-    Fstat <- r2 * dfr/(1 - r2)
-
-    pmat[above] <- 1 - pf(Fstat, 1, dfr)
-    pmat[row(pmat) == col(pmat)] <- NA
-
     rownames(cormat1) <- rownames(abunds)
     colnames(cormat1) <- rownames(abunds)
+    
+    
+    mat <- cormat1
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    pmat <- matrix(NA, n, n)
+    diag(pmat) <- 0
+    for(i in 1:(n-1)){
+      for(j in (i+1):n){
+        tmp <- t.test(mat[,i], mat[,j], conf.level = 0.95, paired=T)
+        pmat[i,j] <- pmat[j,i] <- tmp$p.value
+      }}
+    
     rownames(pmat) <- rownames(abunds)
     colnames(pmat) <- rownames(abunds)
-    cormat <- ifelse(pmat <= threshold.pval, cormat1, NA)
+    
+    cormat <- ifelse(pmat <= 0.05, cormat1, NA)
   }
 
   if(correlation == "CClasso"){

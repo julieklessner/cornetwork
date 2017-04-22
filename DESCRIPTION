@@ -1,8 +1,8 @@
 Package: cornetwork
-Title: What the Package Does (one line, title case)
+Title: Visualisation of correlations 
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Julie", "Pedersen", email = "julieklessnerthun@gmail.com", role = c("aut", "cre"))
+Description: This package allows you to visualize correlations. It has been developed specifically for 16S rRNA amplicon data.
 Depends:
     R (>= 3.3.1)
 License: What license is it under?
