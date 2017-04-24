@@ -29,8 +29,9 @@
 #' @import sna
 #' @import viridis
 #' @import glmnet
-#' @import parallel
-#' @import psych
+#' @import MCMCpack
+#' @import Hmisc
+#' @import pi0
 #' @export
 
 cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshold.obs=0.1, threshold.pval=0.05, show.label=TRUE, scale.abund=FALSE, node.size=5, scale.cor=FALSE, edge.size = 0.5, highlight.OTU=NULL, highlight.color=NULL, highlight.size=10, highlight.label=NULL, tax.aggregate="Phylum", tax.add=NULL, tax.class=NULL, tax.empty="best", add.tax.info=FALSE, show.edge.label=FALSE, correlation = "Pearson", return.output = "top", show.top = 25){
@@ -233,7 +234,7 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
   } else if (add.tax.info == T & scale.abund == T) {
     p <- p + geom_nodes(aes(size= Avg_Abundance, col=taxo_info))
   } else if (add.tax.info == T & scale.abund == F) {
-    p <- p + geom_nodes(aes(size= node.size, col=taxo_info))
+    p <- p + geom_nodes(size= node.size, aes(col=taxo_info))
   }
 
   # Options for labels----------------------------------------------------------------
@@ -280,7 +281,7 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
   }
 
   if(return.output == "top"){
-    Result_list_top <- arrange(Result_list_total, desc(Cor_val)) %>% head(n=show.top)
+    Result_list_top <- arrange(Result_list_total, desc(abs(Cor_val))) %>% head(n=show.top)
     outlist <- list(network = p, Cor_result = Result_list_top)
     return(outlist)
   }
