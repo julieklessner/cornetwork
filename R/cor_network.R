@@ -72,26 +72,42 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
 
 
   if(correlation == "Pearson"){
+    
+    # Calculating correlations
     resp <- rcorr(as.matrix(t(abunds)), type = "pearson")
+    
+    # Extracting correlation matrix
     cormat1 <- resp$r %>% as.matrix()
+    
+    # Extracting correlation matrix
     pmat <- resp$P %>% as.matrix()
     cormat <- ifelse(pmat <= threshold.pval, cormat1, NA)
   }
 
   if(correlation == "Spearman"){
+    
+    # Calculating correlations
     resp <- rcorr(as.matrix(t(abunds)), type = "spearman")
+    
+    # Extracting correlation matrix
     cormat1 <- resp$r %>% as.matrix()
+    
+    # Extracting p-values
     pmat <- resp$P %>% as.matrix()
     cormat <- ifelse(pmat <= threshold.pval, cormat1, NA)
   }
 
   if(correlation == "SparCC"){
-    res_cc <- sparcc(t(abunds))
+    
+    # Calculating correlations
+    res_cc <- sparcc(t(abunds)) # From sparcc.R
+    
+    # Extracting correlation matrix
     cormat1 <- res_cc$Cor
     rownames(cormat1) <- rownames(abunds)
     colnames(cormat1) <- rownames(abunds)
     
-    
+    # Calculating and extracting p-values
     mat <- cormat1
     mat <- as.matrix(mat)
     n <- ncol(mat)
@@ -110,23 +126,35 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
   }
 
   if(correlation == "CClasso"){
-    res_cc <- cclasso(t(abunds), counts = TRUE, n_boot = 20)
+    
+    # Calculating correlations
+    res_cc <- cclasso(t(abunds), counts = TRUE, n_boot = 20) # From CClasso.R
+    
+    # Extracting correlation matrix
     cormat1 <- res_cc$cor_w %>% as.matrix()
     rownames(cormat1) <- rownames(abunds)
     colnames(cormat1) <- rownames(abunds)
+    
+    # Extracting p-values
     pmat <- res_cc$p_vals %>% as.matrix
     rownames(pmat) <- rownames(abunds)
     colnames(pmat) <- rownames(abunds)
+  
     cormat <- ifelse(pmat <= threshold.pval, cormat1, NA)
   }
 
   if(correlation == "Rebacca"){
-    x.rslt <- rebacca(as.matrix(abunds), nbootstrap=20, N.cores=1)
-    tau = stability_cutoff(x.rslt$Stability, x.rslt$q, B=50, FWER=threshold.pval)
-    x.adj = sscore2adjmatrix(x.rslt$Stability, tau)
-    x.est = rebacca_adjm2corr(abunds, x.adj)
-
-    cormat <- x.est$corr %>% as.matrix()
+    
+    # Calculating correlations
+    x.rslt <- rebacca(as.matrix(abunds), nbootstrap=20, N.cores=1) # From REBACCA.R
+    
+    #Producing p-values
+    tau = stability_cutoff(x.rslt$Stability, x.rslt$q, B=50, FWER=threshold.pval) # From REBACCA.R
+    x.adj = sscore2adjmatrix(x.rslt$Stability, tau) # From REBACCA.R
+    
+    #Extracting correlation matrix
+    x.est = rebacca_adjm2corr(abunds, x.adj) # From REBACCA.R
+    cormat <- x.est$corr %>% as.matrix() # From REBACCA.R
     rownames(cormat) <- rownames(abunds)
     colnames(cormat) <- rownames(abunds)
   }
