@@ -6,12 +6,12 @@
 #' @param threshold.abund Threshold value for relative abundance (default: 0.01).
 #' @param threshold.obs Threshold value for the average relative abundance per observation (default: 0.1).
 #' @param threshold.pval Threshold value for the p-value (default: 0.05).
-#' @param show.label Show vertex names as labels (default: TRUE).
+#' @param show.label Show vertex names as labels (default: FALSE).
 #' @param scale.abund Scale the node size according to average abundance (default: FALSE).
 #' @param node.size Size of nodes if scale.abund=FALSE (default: 5)
 #' @param scale.cor Scale the edge color according to strength of correlation (default: FALSE).
 #' @param edge.size Size of egdes if scale.cor=FALSE (default: 0.5)
-#' @param tax.aggregate The taxonomic level that the data should be aggregated to (default: "Phylum")
+#' @param tax.display The taxonomic level that the data should be displayed (default: "Phylum").
 #' @param tax.class Converts a specific phyla to class level instead, e.g. "p__Proteobacteria" (default: "none").
 #' @param tax.empty Either "remove" OTUs without taxonomic information, add "best" classification or add the "OTU" name (default: "best").
 #' @param highlight.OTU Highlight OTUs using see-throgh nodes, e.g. c("MiDAS_37", "MiDAS_73") (default: none).
@@ -34,7 +34,7 @@
 #' @import pi0
 #' @export
 
-cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshold.obs=0.1, threshold.pval=0.05, show.label=TRUE, scale.abund=FALSE, node.size=5, scale.cor=FALSE, edge.size = 0.5, highlight.OTU=NULL, highlight.color=NULL, highlight.size=10, highlight.label=NULL, tax.aggregate="Phylum", tax.add=NULL, tax.class=NULL, tax.empty="best", add.tax.info=FALSE, show.edge.label=FALSE, correlation = "Pearson", return.output = "top", show.top = 25){
+amp_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshold.obs=0.1, threshold.pval=0.05, show.label=FALSE, scale.abund=FALSE, node.size=5, scale.cor=FALSE, edge.size = 0.5, highlight.OTU=NULL, highlight.color=NULL, highlight.size=10, highlight.label=NULL, tax.display="Phylum", tax.add=NULL, tax.class=NULL, tax.empty="best", add.tax.info=FALSE, show.edge.label=FALSE, correlation = "Pearson", return.output = "top", show.top = 25){
 
   data0 <- list(abund = as.data.frame(otu_table(data)@.Data),
                 tax = data.frame(tax_table(data)@.Data, OTU =   rownames(tax_table(data))),
@@ -45,7 +45,7 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
   data1 <- amp_rename(data = data0,
                       tax.class=tax.class,
                       tax.empty=tax.empty,
-                      tax.level = tax.aggregate)
+                      tax.level = tax.display)
 
   # Divide data to seperate data frames --------------------------------------------
 
@@ -122,7 +122,7 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
     rownames(pmat) <- rownames(abunds)
     colnames(pmat) <- rownames(abunds)
     
-    cormat <- ifelse(pmat <= 0.05, cormat1, NA)
+    cormat <- ifelse(pmat <= threshold.pval, cormat1, NA)
   }
 
   if(correlation == "CClasso"){
@@ -209,7 +209,7 @@ cor_network <- function(data, threshold.cor= 0.8, threshold.abund=0.01, threshol
   # Assigning taxonomic information to nodes #
   ############################################
 
-  tax <- data.frame(tax, Display = tax[,tax.aggregate])
+  tax <- data.frame(tax, Display = tax[,tax.display])
   rownames(tax) <- tax$OTU
 
   tax_info = tax[names, ]
